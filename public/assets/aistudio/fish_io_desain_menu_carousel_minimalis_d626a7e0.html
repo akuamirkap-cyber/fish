@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Fish.io — Lautan Berlapis · Feeding Frenzy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ocean-top: #38bdf8;
+      --ocean-mid: #0284c7;
+      --ocean-deep: #0c4a6e;
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(180deg, #56ccf2 0%, #2f80ed 48%, #0b3b60 100%);
+      color: #ffffff;
+    }
+
+    .font-display {
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    /* Efek cahaya matahari dari permukaan laut */
+    .sun-rays {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .ray {
+      position: absolute;
+      top: -20%;
+      width: 18%;
+      height: 140%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.04) 55%, rgba(255, 255, 255, 0) 100%);
+      transform-origin: top center;
+      filter: blur(8px);
+      animation: swayRay 9s ease-in-out infinite alternate;
+    }
+
+    .ray:nth-child(1) { left: 8%; transform: rotate(16deg); animation-delay: 0s; width: 14%; }
+    .ray:nth-child(2) { left: 28%; transform: rotate(10deg); animation-delay: -2s; width: 22%; }
+    .ray:nth-child(3) { left: 54%; transform: rotate(4deg); animation-delay: -4s; width: 18%; }
+    .ray:nth-child(4) { left: 76%; transform: rotate(-6deg); animation-delay: -1s; width: 15%; }
+
+    @keyframes swayRay {
+      0% { opacity: 0.45; transform: rotate(12deg) scaleX(0.95); }
+      100% { opacity: 0.85; transform: rotate(18deg) scaleX(1.08); }
+    }
+
+    /* Animasi mengambang & berenang halus untuk ikan aktif */
+    @keyframes swimFloat {
+      0%, 100% {
+        transform: translate3d(0, 0px, 0) rotate(0deg);
+      }
+      30% {
+        transform: translate3d(0, -10px, 0) rotate(-1.5deg);
+      }
+      70% {
+        transform: translate3d(0, 7px, 0) rotate(1.3deg);
+      }
+    }
+
+    .fish-float {
+      animation: swimFloat 4.4s ease-in-out infinite;
+    }
+
+    /* Efek cahaya lembut di bawah ikan aktif */
+    .fish-spotlight {
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.36) 0%, rgba(125, 211, 252, 0.16) 44%, rgba(255, 255, 255, 0) 72%);
+      transition: transform 0.3s ease-out;
+    }
+
+    /* Glassmorphism ultra-ringan tanpa border berat */
+    .glass-pill {
+      background: rgba(7, 36, 64, 0.28);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .glass-pill-hover:hover {
+      background: rgba(7, 36, 64, 0.44);
+      border-color: rgba(255, 255, 255, 0.34);
+      transform: translateY(-1px);
+    }
+
+    .glass-pill-hover:active {
+      transform: scale(0.96);
+    }
+
+    .glass-modal {
+      background: rgba(8, 38, 68, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 25px 50px -12px rgba(2, 16, 32, 0.6);
+    }
+
+    /* Text shadow lembut agar terbaca jelas langsung di atas air */
+    .ocean-text-shadow {
+      text-shadow: 0 2px 12px rgba(4, 28, 52, 0.55);
+    }
+
+    .logo-shadow {
+      filter: drop-shadow(0 6px 16px rgba(4, 28, 52, 0.4));
+    }
+
+    /* Item carousel digerakkan 100% oleh GPU & JS Spring Physics (tanpa CSS transition bentrok) */
+    .carousel-item {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      will-change: transform, opacity;
+      cursor: grab;
+      touch-action: pan-y;
+    }
+
+    .carousel-item:active {
+      cursor: grabbing;
+    }
+
+    /* Transisi halus saat teks nama/spesies ikan berganti */
+    .fish-info-transition {
+      transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Tombol Main Sekarang modern */
+    .btn-play {
+      background: linear-gradient(135deg, #22c55e 0%, #10b981 50%, #059669 100%);
+      box-shadow: 0 12px 28px -6px rgba(16, 185, 129, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .btn-play:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 16px 34px -6px rgba(16, 185, 129, 0.72), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+    }
+
+    .btn-play:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    /* Badge Langka gradient */
+    .badge-langka {
+      background: linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6);
+      box-shadow: 0 2px 10px rgba(236, 72, 153, 0.45);
+    }
+
+    .badge-epik {
+      background: linear-gradient(90deg, #38bdf8, #6366f1);
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+    }
+
+    .badge-umum {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Custom scrollbar halus untuk modal */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body class="relative w-full h-full select-none">
+
+  <!-- Kanvas Bawah Laut Interaktif (Gelembung, Ikan Latar Belakang, Partikel Cahaya) -->
+  <canvas id="oceanCanvas" class="fixed inset-0 w-full h-full z-0 pointer-events-none"></canvas>
+
+  <!-- Efek Sinar Matahari Menembus Air -->
+  <div class="sun-rays">
+    <div class="ray"></div>
+    <div class="ray"></div>
+    <div class="ray"></div>
+    <div class="ray"></div>
+  </div>
+
+  <!-- Antarmuka Utama (Tanpa Kotak / Tanpa Papan Kayu) -->
+  <main class="relative z-10 flex flex-col justify-between w-full h-full px-4 py-4 sm:px-8 sm:py-6 max-w-7xl mx-auto">
+
+    <!-- 1. HEADER MINIMALIS -->
+    <header class="w-full flex flex-col md:flex-row items-center justify-between gap-3">
+      <!-- Kiri: Navigasi Tab Ringan -->
+      <nav class="flex items-center gap-1.5 sm:gap-2 order-2 md:order-1">
+        <button id="tabCarousel" onclick="switchView('carousel')" class="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold bg-white/25 text-white border border-white/35 shadow-sm transition-all flex items-center gap-1.5">
+          <span>🐟</span>
+          <span>Ikan Frenzy <span class="opacity-80 font-normal">(11)</span></span>
+        </button>
+        <button id="tabUpgrade" onclick="openModal('upgradeModal')" class="glass-pill glass-pill-hover px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-white/90 transition-all flex items-center gap-1.5">
+          <span class="text-amber-300">⚡</span>
+          <span>Upgrade</span>
+        </button>
+        <button id="tabPiagam" onclick="openModal('piagamModal')" class="glass-pill glass-pill-hover px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-medium text-white/90 transition-all flex items-center gap-1.5">
+          <span class="text-amber-300">🏅</span>
+          <span>Piagam <span class="text-xs opacity-75">2/14</span></span>
+        </button>
+      </nav>
+
+      <!-- Tengah: Logo Fish.io Bersih -->
+      <div class="flex flex-col items-center text-center order-1 md:order-2">
+        <div class="flex items-center gap-2 logo-shadow">
+          <!-- Ikon Ikan Badut Mini di Samping Logo -->
+          <svg class="w-7 h-7 sm:w-9 sm:h-9 -rotate-6" viewBox="0 0 64 64" fill="none">
+            <path d="M14 32C14 21 25 14 38 16C46 17 52 24 54 32C52 40 46 47 38 48C25 50 14 43 14 32Z" fill="#FF6B1A"/>
+            <path d="M27 15.5C29 22 29 42 27 48.5C30 48.8 33 48.5 35 48C37 41 37 23 35 16C33 15.5 30 15.2 27 15.5Z" fill="#FFFFFF"/>
+            <path d="M41 17.5C42.5 23 42.5 41 41 46.5C43 45.8 45 44.5 46.5 43C47.5 37 47.5 27 46.5 21C45 19.5 43 18.2 41 17.5Z" fill="#FFFFFF"/>
+            <path d="M15 32L5 22V42L15 32Z" fill="#FF6B1A"/>
+            <circle cx="46" cy="28" r="3" fill="#0F172A"/>
+            <circle cx="47" cy="27" r="1" fill="#FFFFFF"/>
+          </svg>
+          <h1 class="font-display text-3xl sm:text-5xl font-bold tracking-tight text-white">
+            Fish<span class="text-amber-300">.io</span>
+          </h1>
+          <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/15 text-sky-100 border border-white/20 -mt-4">
+            PausGabut
+          </span>
+        </div>
+        <p class="text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-sky-100/90 ocean-text-shadow mt-0.5">
+          ⚓ Lautan Berlapis · Feeding Frenzy
+        </p>
+      </div>
+
+      <!-- Kanan: Saldo Koin & Acak Ikan -->
+      <div class="flex items-center gap-2 order-3">
+        <button onclick="randomFish()" title="Pilih Ikan Acak" class="glass-pill glass-pill-hover px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold text-white flex items-center gap-1.5 transition-transform active:scale-95">
+          <span>🎲</span>
+          <span class="hidden sm:inline">Acak Ikan</span>
+        </button>
+        <div class="glass-pill px-3.5 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+          <span class="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-[11px] font-extrabold text-amber-950 shadow-inner">
+            $
+          </span>
+          <span id="coinDisplay" class="font-bold text-sm sm:text-base tracking-wide text-amber-200">1,995</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. AREA CAROUSEL IKAN UTAMA (MENGAMBANG LANGSUNG DI AIR) -->
+    <section id="carouselStage" class="relative flex-1 w-full flex items-center justify-center my-1 overflow-visible cursor-grab active:cursor-grabbing select-none">
+      
+      <!-- Cahaya Sorot Lembut di Belakang Ikan Tengah -->
+      <div id="fishSpotlight" class="fish-spotlight absolute w-[280px] h-[280px] sm:w-[440px] sm:h-[440px] rounded-full pointer-events-none"></div>
+
+      <!-- Tombol Navigasi Kiri Minimalis -->
+      <button onclick="prevFish()" aria-label="Ikan Sebelumnya" class="glass-pill glass-pill-hover absolute left-1 sm:left-6 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center text-white/90 hover:text-white">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      <!-- Wadah Item Carousel Ikan -->
+      <div id="carouselTrack" class="relative w-full h-full flex items-center justify-center perspective-[1000px]">
+        <!-- Item ikan akan dirender secara dinamis oleh JavaScript -->
+      </div>
+
+      <!-- Tombol Navigasi Kanan Minimalis -->
+      <button onclick="nextFish()" aria-label="Ikan Berikutnya" class="glass-pill glass-pill-hover absolute right-1 sm:right-6 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full flex items-center justify-center text-white/90 hover:text-white">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+
+      <!-- Indikator Titik / Scrubber Interaktif di Bawah Area Ikan -->
+      <div id="carouselDots" class="glass-pill px-3 py-1.5 rounded-full absolute bottom-1 flex items-center gap-1.5 z-20"></div>
+    </section>
+
+    <!-- 3. INFORMASI IKAN AKTIF & KONTROL MINIMALIS -->
+    <section class="w-full flex flex-col items-center gap-3.5 z-20">
+      
+      <!-- Nama Ikan & Deskripsi -->
+      <div id="fishInfoBox" class="fish-info-transition text-center flex flex-col items-center">
+        <div class="flex items-center justify-center gap-2.5 flex-wrap">
+          <h2 id="fishName" class="font-display text-3xl sm:text-4xl font-bold text-white ocean-text-shadow tracking-wide">
+            Alba
+          </h2>
+          <span id="fishBadge" class="badge-langka text-[10px] sm:text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white">
+            ★ LANGKA
+          </span>
+        </div>
+        <p id="fishSubtitle" class="text-xs sm:text-sm font-medium text-sky-100/90 ocean-text-shadow mt-0.5">
+          Aligator Albino Langka
+        </p>
+      </div>
+
+      <!-- Bar Kontrol Ringkas: Input Nama + Kecepatan Ikan -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4 w-full max-w-xl">
+        
+        <!-- Input Nama Pemain Transparan -->
+        <div class="glass-pill flex items-center gap-2 px-3.5 py-2 rounded-full w-full sm:w-48 focus-within:border-white/50 transition-all">
+          <span class="text-sky-200 text-xs">🏷️</span>
+          <input 
+            id="playerNameInput" 
+            type="text" 
+            value="D" 
+            maxlength="16"
+            placeholder="Nama Pemain..."
+            aria-label="Nama Pemain"
+            class="bg-transparent border-none outline-none text-white font-bold text-sm w-full placeholder-white/50 text-center sm:text-left"
+          />
+        </div>
+
+        <!-- Pemilih Kecepatan Ikan Minimalis -->
+        <div class="glass-pill flex items-center justify-between sm:justify-start gap-1.5 px-3 py-1.5 rounded-full w-full sm:w-auto">
+          <span class="text-xs font-semibold text-sky-100/90 flex items-center gap-1 pr-1">
+            <span class="text-amber-300">⚡</span>
+            <span class="hidden md:inline">Kecepatan:</span>
+          </span>
+          <div class="flex items-center gap-1" id="speedSelector">
+            <button onclick="setSpeed('0.8x')" data-speed="0.8x" class="speed-btn px-2.5 py-1 rounded-full text-xs font-bold text-white/75 hover:text-white transition-all">0.8x</button>
+            <button onclick="setSpeed('1.0x')" data-speed="1.0x" class="speed-btn px-2.5 py-1 rounded-full text-xs font-bold bg-amber-400 text-slate-950 shadow-sm transition-all">1.0x</button>
+            <button onclick="setSpeed('1.3x')" data-speed="1.3x" class="speed-btn px-2.5 py-1 rounded-full text-xs font-bold text-white/75 hover:text-white transition-all">1.3x</button>
+            <button onclick="setSpeed('1.6x')" data-speed="1.6x" class="speed-btn px-2.5 py-1 rounded-full text-xs font-bold text-white/75 hover:text-white transition-all">1.6x</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tombol Utama MAIN SEKARANG! -->
+      <button onclick="startGame()" class="btn-play px-10 sm:px-14 py-3.5 sm:py-4 rounded-full font-display text-lg sm:text-xl font-bold tracking-wider text-white flex items-center gap-2.5 cursor-pointer">
+        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <span>MAIN SEKARANG!</span>
+      </button>
+
+    </section>
+
+    <!-- 4. FOOTER RINGKAS -->
+    <footer class="w-full flex flex-col sm:flex-row items-center justify-between gap-1.5 text-[11px] sm:text-xs text-sky-100/85 ocean-text-shadow pt-2">
+      <div class="flex items-center gap-2 flex-wrap justify-center">
+        <span>🖱️ Kursor Berenang</span>
+        <span class="opacity-40">•</span>
+        <span class="text-cyan-200 font-semibold">Klik Kiri / Spasi Sedot</span>
+        <span class="opacity-40">•</span>
+        <span class="text-amber-200 font-semibold">Klik Kanan / Shift Boost</span>
+      </div>
+      <div class="flex items-center gap-1.5 font-semibold">
+        <span>🏆</span>
+        <span>Skor Rekor: <strong class="text-amber-300 font-extrabold">68,594</strong></span>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- OVERLAY MODAL: UPGRADE (Glassmorphism Minimalis) -->
+  <div id="upgradeModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/45 backdrop-blur-sm transition-opacity">
+    <div class="glass-modal w-full max-w-md rounded-3xl p-6 text-white relative animate-fadeIn">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚡</span>
+          <h3 class="font-display text-xl font-bold">Upgrade Kemampuan</h3>
+        </div>
+        <button onclick="closeModal('upgradeModal')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm">✕</button>
+      </div>
+      <div class="space-y-3" id="upgradeList">
+        <!-- Diisi oleh JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY MODAL: KOLEKSI PIAGAM & JULUKAN -->
+  <div id="piagamModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-950/45 backdrop-blur-sm transition-opacity">
+    <div class="glass-modal w-full max-w-lg rounded-3xl p-6 text-white relative">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🏅</span>
+          <div>
+            <h3 class="font-display text-xl font-bold">Koleksi Piagam & Julukan</h3>
+            <p class="text-xs text-sky-200/80">Terbuka 2 dari 14 pencapaian lautan</p>
+          </div>
+        </div>
+        <button onclick="closeModal('piagamModal')" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm">✕</button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1" id="piagamList">
+        <!-- Diisi oleh JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFIKASI / TOAST MINIMALIS (PENGGANTI ALERT) -->
+  <div id="toastNotification" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 translate-y-2">
+    <div class="glass-modal px-5 py-2.5 rounded-full flex items-center gap-2.5 text-sm font-semibold text-white shadow-xl">
+      <span id="toastIcon">🐟</span>
+      <span id="toastMessage">Memulai permainan...</span>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * DATA KARAKTER IKAN (Sesuai Gambar Referensi + Ikan Tambahan)
+     * Setiap ikan memiliki ilustrasi SVG vektor kustom beresolusi tajam.
+     */
+    const FISH_DATA = [
+      {
+        id: 'alba',
+        name: 'Alba',
+        species: 'Aligator Albino Langka',
+        rarity: 'LANGKA',
+        badgeClass: 'badge-langka',
+        svg: `
+          <svg viewBox="0 0 260 150" class="w-full h-full drop-shadow-[0_16px_22px_rgba(0,0,0,0.35)]">
+            <!-- Ekor Berduri Albino -->
+            <path d="M22 76 L68 62 L72 90 L22 76 Z" fill="#f3d5d5" stroke="#9e6b6b" stroke-width="2"/>
+            <polygon points="34,71 42,61 48,69" fill="#fff1f2" stroke="#9e6b6b" stroke-width="1.5"/>
+            <polygon points="48,67 57,56 63,65" fill="#fff1f2" stroke="#9e6b6b" stroke-width="1.5"/>
+            <!-- Kaki Belakang & Depan -->
+            <path d="M92 92 L82 114 L96 116 L106 94 Z" fill="#e8c2c2" stroke="#8f5c5c" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M154 92 L146 115 L160 116 L168 93 Z" fill="#f5dada" stroke="#8f5c5c" stroke-width="2" stroke-linejoin="round"/>
+            <!-- Badan Utama Aligator Albino -->
+            <path d="M64 75 C85 48, 145 46, 178 68 C196 66, 224 68, 236 78 C224 89, 194 92, 174 91 C142 98, 88 96, 64 75 Z" fill="#fae8e8" stroke="#8f5c5c" stroke-width="2.5"/>
+            <!-- Sisik Duri Punggung Berlapis -->
+            <g fill="#f2cccc" stroke="#8f5c5c" stroke-width="1.8" stroke-linejoin="round">
+              <polygon points="78,64 90,46 102,62"/>
+              <polygon points="96,60 110,40 124,59"/>
+              <polygon points="116,58 132,38 146,58"/>
+              <polygon points="138,60 152,43 164,62"/>
+              <polygon points="88,73 102,57 115,73"/>
+              <polygon points="110,72 125,55 139,72"/>
+              <polygon points="132,73 146,57 159,74"/>
+            </g>
+            <!-- Garis Mulut & Gigi -->
+            <path d="M188 80 Q212 83 235 78" fill="none" stroke="#8f5c5c" stroke-width="2.2" stroke-linecap="round"/>
+            <polygon points="204,81 207,86 210,81" fill="#ffffff"/>
+            <polygon points="218,80 221,85 224,80" fill="#ffffff"/>
+            <!-- Mata Merah Albino -->
+            <circle cx="185" cy="68" r="6.5" fill="#ffffff" stroke="#8f5c5c" stroke-width="1.8"/>
+            <circle cx="186.5" cy="68" r="3.5" fill="#e11d48"/>
+            <circle cx="187.5" cy="66.5" r="1.2" fill="#ffffff"/>
+          </svg>
+        `
+      },
+      {
+        id: 'andy',
+        name: 'Andy',
+        species: 'Angelfish Klasik',
+        rarity: 'UMUM',
+        badgeClass: 'badge-umum',
+        svg: `
+          <svg viewBox="0 0 220 160" class="w-full h-full drop-shadow-[0_14px_20px_rgba(0,0,0,0.3)]">
+            <!-- Sirip Atas & Bawah -->
+            <path d="M88 46 Q68 14 48 22 Q72 48 76 62 Z" fill="#f97316" stroke="#9a3412" stroke-width="2"/>
+            <path d="M88 114 Q68 146 48 138 Q72 112 76 98 Z" fill="#f97316" stroke="#9a3412" stroke-width="2"/>
+            <!-- Ekor -->
+            <path d="M58 80 L26 56 Q36 80 26 104 Z" fill="#fb923c" stroke="#9a3412" stroke-width="2"/>
+            <!-- Badan -->
+            <path d="M54 80 C76 42, 134 40, 174 80 C134 120, 76 118, 54 80 Z" fill="url(#andyGrad)" stroke="#9a3412" stroke-width="2.5"/>
+            <defs>
+              <linearGradient id="andyGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#fde047"/>
+                <stop offset="50%" stop-color="#fb923c"/>
+                <stop offset="100%" stop-color="#ea580c"/>
+              </linearGradient>
+            </defs>
+            <!-- Garis Belang Angelfish -->
+            <path d="M98 49 Q92 80 98 111" fill="none" stroke="#fff7ed" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+            <path d="M126 53 Q120 80 126 107" fill="none" stroke="#fff7ed" stroke-width="6" stroke-linecap="round" opacity="0.85"/>
+            <!-- Mata -->
+            <circle cx="146" cy="73" r="7" fill="#ffffff" stroke="#9a3412" stroke-width="1.8"/>
+            <circle cx="148" cy="73" r="3.5" fill="#1e293b"/>
+            <circle cx="149" cy="71.5" r="1.3" fill="#ffffff"/>
+          </svg>
+        `
+      },
+      {
+        id: 'ryan',
+        name: 'Ryan',
+        species: 'Angelfish Biru',
+        rarity: 'UMUM',
+        badgeClass: 'badge-umum',
+        svg: `
+          <svg viewBox="0 0 220 160" class="w-full h-full drop-shadow-[0_14px_20px_rgba(0,0,0,0.3)]">
+            <path d="M92 44 Q72 12 52 20 Q74 46 78 60 Z" fill="#0284c7" stroke="#0c4a6e" stroke-width="2"/>
+            <path d="M92 116 Q72 148 52 140 Q74 114 78 100 Z" fill="#0284c7" stroke="#0c4a6e" stroke-width="2"/>
+            <path d="M58 80 L26 54 Q38 80 26 106 Z" fill="#38bdf8" stroke="#0c4a6e" stroke-width="2"/>
+            <path d="M54 80 C76 38, 136 38, 176 80 C136 122, 76 122, 54 80 Z" fill="#38bdf8" stroke="#0c4a6e" stroke-width="2.5"/>
+            <path d="M100 46 Q94 80 100 114" fill="none" stroke="#e0f2fe" stroke-width="7" stroke-linecap="round" opacity="0.85"/>
+            <path d="M128 52 Q122 80 128 108" fill="none" stroke="#0284c7" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+            <circle cx="148" cy="73" r="7" fill="#ffffff" stroke="#0c4a6e" stroke-width="1.8"/>
+            <circle cx="150" cy="73" r="3.5" fill="#0f172a"/>
+            <circle cx="151" cy="71.5" r="1.3" fill="#ffffff"/>
+          </svg>
+        `
+      },
+      {
+        id: 'si-oren',
+        name: 'Si Oren',
+        species: 'Clownfish Badut',
+        rarity: 'UMUM',
+        badgeClass: 'badge-umum',
+        svg: `
+          <svg viewBox="0 0 220 150" class="w-full h-full drop-shadow-[0_14px_20px_rgba(0,0,0,0.3)]">
+            <path d="M52 75 L22 50 Q30 75 22 100 Z" fill="#ff6b1a" stroke="#7c2d12" stroke-width="2.5"/>
+            <path d="M88 46 Q104 24 122 46 Z" fill="#ff6b1a" stroke="#7c2d12" stroke-width="2"/>
+            <path d="M92 104 Q106 124 122 104 Z" fill="#ff6b1a" stroke="#7c2d12" stroke-width="2"/>
+            <ellipse cx="114" cy="75" rx="64" ry="34" fill="#ff6b1a" stroke="#7c2d12" stroke-width="2.5"/>
+            <!-- Belang Putih Khas Clownfish -->
+            <path d="M84 44 C90 64 90 86 84 106 C92 108 100 108 106 106 C112 86 112 64 106 44 C100 42 92 42 84 44 Z" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+            <path d="M134 46 C139 64 139 86 134 104 C141 102 147 100 152 96 C156 82 156 68 152 54 C147 50 141 48 134 46 Z" fill="#ffffff" stroke="#1e293b" stroke-width="2"/>
+            <!-- Sirip Samping -->
+            <path d="M112 78 Q94 94 106 104 Q122 96 122 82 Z" fill="#fb923c" stroke="#7c2d12" stroke-width="2"/>
+            <circle cx="158" cy="68" r="6.5" fill="#ffffff" stroke="#1e293b" stroke-width="1.8"/>
+            <circle cx="160" cy="68" r="3.3" fill="#0f172a"/>
+            <circle cx="161" cy="66.5" r="1.2" fill="#ffffff"/>
+          </svg>
+        `
+      },
+      {
+        id: 'boris',
+        name: 'Boris',
+        species: 'Butterfly FF2',
+        rarity: 'EPIK',
+        badgeClass: 'badge-epik',
+        svg: `
+          <svg viewBox="0 0 220 155" class="w-full h-full drop-shadow-[0_14px_20px_rgba(0,0,0,0.3)]">
+            <path d="M56 78 L24 52 Q34 78 24 104 Z" fill="#facc15" stroke="#1e3a8a" stroke-width="2.2"/>
+            <path d="M52 78 C72 34, 146 34, 178 78 C146 122, 72 122, 52 78 Z" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="2.5"/>
+            <path d="M64 78 C82 44, 136 44, 162 78 C136 112, 82 112, 64 78 Z" fill="#facc15"/>
+            <path d="M126 42 Q138 78 126 114 L156 104 Q168 78 156 52 Z" fill="#ffffff"/>
+            <path d="M148 48 Q158 78 148 108" fill="none" stroke="#0f172a" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="152" cy="70" r="6.5" fill="#ffffff" stroke="#0f172a" stroke-width="1.8"/>
+            <circle cx="154" cy="70" r="3.3" fill="#0f172a"/>
+          </svg>
+        `
+      },
+      {
+        id: 'layla',
+        name: 'Layla',
+        species: 'Queen Trigger',
+        rarity: 'EPIK',
+        badgeClass: 'badge-epik',
+        svg: `
+          <svg viewBox="0 0 220 155" class="w-full h-full drop-shadow-[0_14px_20px_rgba(0,0,0,0.3)]">
+            <path d="M56 78 L22 48 L36 78 L22 108 Z" fill="#14b8a6" stroke="#115e59" stroke-width="2"/>
+            <path d="M54 78 C84 36, 142 36, 182 78 C142 120, 84 120, 54 78 Z" fill="#2dd4bf" stroke="#115e59" stroke-width="2.5"/>
+            <path d="M74 78 C98 48, 138 48, 166 78 C138 108, 98 108, 74 78 Z" fill="#fde047" opacity="0.85"/>
+            <path d="M146 62 Q166 78 146 96" fill="none" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="150" cy="68" r="6.5" fill="#ffffff" stroke="#115e59" stroke-width="1.8"/>
+            <circle cx="152" cy="68" r="3.3" fill="#0f172a"/>
+          </svg>
+        `
+      },
+      {
+        id: 'pierre',
+        name: 'Pierre',
+        species: 'Kerapu Bintik',
+        rarity: 'UMUM',
+        badgeClass: 'badge-umum',
+        svg: `
+          <svg viewBox="0 0 230 150" class="w-full h-full drop-shadow-[0_14px_20px_rgba(0,0,0,0.3)]">
+            <path d="M54 76 L22 52 Q28 76 22 100 Z" fill="#4f46e5" stroke="#1e1b4b" stroke-width="2.2"/>
+            <ellipse cx="118" cy="76" rx="68" ry="36" fill="#6366f1" stroke="#1e1b4b" stroke-width="2.5"/>
+            <circle cx="90" cy="64" r="4" fill="#c7d2fe" opacity="0.7"/>
+            <circle cx="112" cy="58" r="5" fill="#c7d2fe" opacity="0.7"/>
+            <circle cx="104" cy="82" r="4.5" fill="#c7d2fe" opacity="0.7"/>
+            <circle cx="130" cy="74" r="4" fill="#c7d2fe" opacity="0.7"/>
+            <circle cx="82" cy="84" r="3.5" fill="#c7d2fe" opacity="0.7"/>
+            <circle cx="162" cy="68" r="7" fill="#ffffff" stroke="#1e1b4b" stroke-width="1.8"/>
+            <circle cx="164" cy="68" r="3.5" fill="#0f172a"/>
+          </svg>
+        `
+      },
+      {
+        id: 'leon',
+        name: 'Leon',
+        species: 'Lionfish Kipas',
+        rarity: 'EPIK',
+        badgeClass: 'badge-epik',
+        svg: `
+          <svg viewBox="0 0 230 165" class="w-full h-full drop-shadow-[0_14px_20px_rgba(0,0,0,0.32)]">
+            <!-- Duri Kipas Panjang -->
+            <g stroke="#fef08a" stroke-width="3.5" stroke-linecap="round">
+              <line x1="115" y1="64" x2="72" y2="18"/>
+              <line x1="125" y1="62" x2="98" y2="14"/>
+              <line x1="135" y1="64" x2="124" y2="16"/>
+              <line x1="112" y1="98" x2="74" y2="144"/>
+              <line x1="126" y1="100" x2="104" y2="148"/>
+            </g>
+            <path d="M56 82 L22 56 L32 82 L22 108 Z" fill="#fef08a" opacity="0.85"/>
+            <ellipse cx="122" cy="82" rx="60" ry="32" fill="#f8fafc" stroke="#78350f" stroke-width="2.2"/>
+            <path d="M86 55 L96 109 M108 51 L118 113 M130 52 L140 112 M152 58 L160 106" stroke="#9a3412" stroke-width="7"/>
+            <circle cx="162" cy="74" r="6.5" fill="#ffffff" stroke="#78350f" stroke-width="1.8"/>
+            <circle cx="164" cy="74" r="3.3" fill="#0f172a"/>
+          </svg>
+        `
+      },
+      {
+        id: 'peter',
+        name: 'Peter',
+        species: 'John Dory FF2',
+        rarity: 'UMUM',
+        badgeClass: 'badge-umum',
+        svg: `
+          <svg viewBox="0 0 220 155" class="w-full h-full drop-shadow-[0_14px_20px_rgba(0,0,0,0.3)]">
+            <path d="M56 78 L24 54 L32 78 L24 102 Z" fill="#65a30d" stroke="#1a2e05" stroke-width="2"/>
+            <ellipse cx="118" cy="78" rx="62" ry="38" fill="#84cc16" stroke="#1a2e05" stroke-width="2.5"/>
+            <circle cx="118" cy="78" r="13" fill="#1a2e05" stroke="#fef08a" stroke-width="2.5"/>
+            <circle cx="158" cy="68" r="7.5" fill="#ffffff" stroke="#1a2e05" stroke-width="1.8"/>
+            <circle cx="160" cy="68" r="3.8" fill="#0f172a"/>
+          </svg>
+        `
+      },
+      {
+        id: 'zack',
+        name: 'Zack',
+        species: 'Angler Laut Dalam',
+        rarity: 'LANGKA',
+        badgeClass: 'badge-langka',
+        svg: `
+          <svg viewBox="0 0 230 160" class="w-full h-full drop-shadow-[0_14px_22px_rgba(0,0,0,0.38)]">
+            <!-- Antena Lentera Bercahaya -->
+            <path d="M148 52 Q178 18 198 44" fill="none" stroke="#4d7c0f" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="198" cy="46" r="9" fill="#fef08a" opacity="0.45"/>
+            <circle cx="198" cy="46" r="5" fill="#fef9c3"/>
+            <path d="M52 84 L20 60 L28 84 L20 108 Z" fill="#4d7c0f" stroke="#1a2e05" stroke-width="2"/>
+            <ellipse cx="116" cy="84" rx="64" ry="40" fill="#65a30d" stroke="#1a2e05" stroke-width="2.5"/>
+            <!-- Mulut & Gigi Tajam -->
+            <path d="M136 96 Q162 104 178 90" fill="none" stroke="#1a2e05" stroke-width="3" stroke-linecap="round"/>
+            <polygon points="146,98 150,89 154,99" fill="#ffffff"/>
+            <polygon points="160,97 164,88 168,96" fill="#ffffff"/>
+            <circle cx="154" cy="70" r="7.5" fill="#fef08a" stroke="#1a2e05" stroke-width="1.8"/>
+            <circle cx="156" cy="70" r="3.5" fill="#0f172a"/>
+          </svg>
+        `
+      },
+      {
+        id: 'goliath',
+        name: 'Goliath',
+        species: 'Paus Orca',
+        rarity: 'LANGKA',
+        badgeClass: 'badge-langka',
+        svg: `
+          <svg viewBox="0 0 250 155" class="w-full h-full drop-shadow-[0_16px_22px_rgba(0,0,0,0.38)]">
+            <path d="M114 48 L96 14 L132 46 Z" fill="#0f172a"/>
+            <path d="M46 80 L16 56 L26 80 L16 104 Z" fill="#0f172a"/>
+            <path d="M42 80 C76 38, 168 38, 214 82 C168 118, 76 116, 42 80 Z" fill="#0f172a" stroke="#020617" stroke-width="2"/>
+            <path d="M98 96 C134 108, 178 104, 206 86 C176 92, 134 92, 98 96 Z" fill="#ffffff"/>
+            <ellipse cx="176" cy="70" rx="13" ry="6" transform="rotate(-12 176 70)" fill="#ffffff"/>
+            <circle cx="160" cy="72" r="4" fill="#ffffff"/>
+            <circle cx="161" cy="72" r="2" fill="#0f172a"/>
+          </svg>
+        `
+      }
+    ];
+
+    // State Aplikasi & Physics Carousel
+    let targetIndex = 0;       // Posisi tujuan (bilangan bulat saat diam)
+    let smoothIndex = 0;       // Posisi pecahan kontinu untuk render 60fps+
+    let velocity = 0;          // Kecepatan pegas / momentum inersia
+    let lastDisplayedIndex = -1;
+    let isDragging = false;
+    let dragMoved = false;
+    let dragStartX = 0;
+    let dragStartIndex = 0;
+    let lastPointerX = 0;
+    let lastPointerTime = 0;
+    let pointerVelocity = 0;
+
+    let selectedSpeed = '1.0x';
+    let coins = 1995;
+
+    const carouselTrack = document.getElementById('carouselTrack');
+    const carouselDots = document.getElementById('carouselDots');
+    const fishInfoBox = document.getElementById('fishInfoBox');
+    const fishNameEl = document.getElementById('fishName');
+    const fishSubtitleEl = document.getElementById('fishSubtitle');
+    const fishBadgeEl = document.getElementById('fishBadge');
+    const fishSpotlight = document.getElementById('fishSpotlight');
+
+    let itemElements = [];
+    let innerElements = [];
+    let dotElements = [];
+
+    /**
+     * Inisialisasi Item Carousel (Sekali Render DOM untuk Performa Maksimal)
+     */
+    function initCarousel() {
+      carouselTrack.innerHTML = '';
+      carouselDots.innerHTML = '';
+      itemElements = [];
+      innerElements = [];
+      dotElements = [];
+
+      FISH_DATA.forEach((fish, idx) => {
+        // Elemen Ikan Mengambang (Tanpa Kotak/Kartu)
+        const item = document.createElement('div');
+        item.className = 'carousel-item flex items-center justify-center';
+        item.dataset.index = idx;
+
+        const inner = document.createElement('div');
+        inner.className = 'fish-inner w-[210px] h-[145px] sm:w-[310px] sm:h-[205px] md:w-[350px] md:h-[225px] flex items-center justify-center pointer-events-none';
+        inner.innerHTML = fish.svg;
+        item.appendChild(inner);
+
+        // Klik langsung pada ikan di samping (hanya jika bukan gerakan drag)
+        item.addEventListener('click', () => {
+          if (dragMoved) return;
+          goToNearestFish(idx);
+        });
+
+        carouselTrack.appendChild(item);
+        itemElements.push(item);
+        innerElements.push(inner);
+
+        // Titik Indikator Scrubber Interaktif
+        const dot = document.createElement('button');
+        dot.className = 'h-2 rounded-full transition-all duration-300 bg-white/35 hover:bg-white/75 cursor-pointer';
+        dot.style.width = '8px';
+        dot.ariaLabel = `Pilih ${fish.name}`;
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          goToNearestFish(idx);
+        });
+        carouselDots.appendChild(dot);
+        dotElements.push(dot);
+      });
+
+      updateFishInfoUI(0, true);
+    }
+
+    /**
+     * Mencari jalur terpendek melingkar menuju index ikan tertentu
+     */
+    function goToNearestFish(desiredModIndex) {
+      const total = FISH_DATA.length;
+      const currentMod = ((Math.round(targetIndex) % total) + total) % total;
+      let diff = desiredModIndex - currentMod;
+      if (diff > total / 2) diff -= total;
+      if (diff < -total / 2) diff += total;
+      targetIndex = Math.round(targetIndex) + diff;
+    }
+
+    /**
+     * Memperbarui Info Teks & Indikator Titik saat Ikan Aktif Berubah
+     */
+    function updateFishInfoUI(activeModIndex, immediate = false) {
+      if (activeModIndex === lastDisplayedIndex && !immediate) return;
+      lastDisplayedIndex = activeModIndex;
+
+      const activeFish = FISH_DATA[activeModIndex];
+
+      // Animasi transisi teks super halus
+      if (!immediate) {
+        fishInfoBox.style.opacity = '0.35';
+        fishInfoBox.style.transform = 'translateY(4px)';
+      }
+
+      requestAnimationFrame(() => {
+        fishNameEl.textContent = activeFish.name;
+        fishSubtitleEl.textContent = activeFish.species;
+        fishBadgeEl.className = `${activeFish.badgeClass} text-[10px] sm:text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white`;
+        fishBadgeEl.textContent = activeFish.rarity === 'LANGKA' ? '★ LANGKA' : activeFish.rarity;
+
+        fishInfoBox.style.opacity = '1';
+        fishInfoBox.style.transform = 'translateY(0)';
+      });
+
+      // Update Dots
+      dotElements.forEach((dot, idx) => {
+        if (idx === activeModIndex) {
+          dot.style.width = '24px';
+          dot.classList.remove('bg-white/35');
+          dot.classList.add('bg-amber-300', 'shadow-[0_0_8px_rgba(252,211,77,0.7)]');
+        } else {
+          dot.style.width = '8px';
+          dot.classList.add('bg-white/35');
+          dot.classList.remove('bg-amber-300', 'shadow-[0_0_8px_rgba(252,211,77,0.7)]');
+        }
+      });
+    }
+
+    /**
+     * LOOP FISIKA CRITICALLY DAMPED & RENDER GPU 60FPS+
+     * Menggunakan interpolasi eksponensial bebas-pantulan (zero overshoot) agar geseran mantap dan tidak wiggle.
+     */
+    let lastFrameTime = performance.now();
+
+    function updateCarouselPhysics(now = performance.now()) {
+      const total = FISH_DATA.length;
+      const isMobile = window.innerWidth < 640;
+      const dt = Math.min(0.05, (now - lastFrameTime) / 1000);
+      lastFrameTime = now;
+
+      if (!isDragging) {
+        // Peluruhan momentum inersia yang halus tanpa memantul balik
+        if (Math.abs(velocity) > 0.0001) {
+          targetIndex += velocity * dt * 60;
+          velocity *= Math.pow(0.84, dt * 60);
+          if (Math.abs(velocity) < 0.0015) {
+            velocity = 0;
+            targetIndex = Math.round(targetIndex);
+          }
+        }
+
+        // Critically damped exponential smoothing (tanpa osilasi / wiggle sama sekali)
+        const lerpFactor = 1 - Math.exp(-14 * dt);
+        smoothIndex += (targetIndex - smoothIndex) * lerpFactor;
+
+        if (Math.abs(targetIndex - smoothIndex) < 0.0005 && velocity === 0) {
+          smoothIndex = targetIndex;
+        }
+      }
+
+      // Tentukan ikan yang paling dekat ke tengah untuk UI teks & efek berenang
+      const nearestIndex = Math.round(smoothIndex);
+      const activeModIndex = ((nearestIndex % total) + total) % total;
+      updateFishInfoUI(activeModIndex);
+
+      // Efek sorotan cahaya mengikuti pergeseran halus
+      const centerFraction = smoothIndex - nearestIndex;
+      fishSpotlight.style.transform = `translate3d(${-centerFraction * 45}px, 0, 0) scale(${1 - Math.abs(centerFraction) * 0.08})`;
+
+      // Render posisi tiap ikan secara kontinu berdasarkan jarak pecahan (offset)
+      const spacingX = isMobile ? 165 : 295;
+
+      for (let idx = 0; idx < total; idx++) {
+        // Hitung offset pecahan terpendek dalam lingkaran
+        let offset = (idx - smoothIndex) % total;
+        if (offset > total / 2) offset -= total;
+        if (offset < -total / 2) offset += total;
+
+        const absOffset = Math.abs(offset);
+        const item = itemElements[idx];
+        const inner = innerElements[idx];
+
+        if (absOffset > 2.65) {
+          item.style.opacity = '0';
+          item.style.pointerEvents = 'none';
+          continue;
+        }
+
+        // Kurva skala kontinu: membesar mulus di tengah (1.08), mengecil di samping
+        const scale = Math.max(0.24, 1.08 * Math.exp(-0.52 * absOffset * absOffset));
+
+        // Posisi horizontal melengkung alami (sedikit rapat di kejauhan)
+        const translateX = Math.sign(offset) * Math.pow(absOffset, 0.88) * spacingX;
+
+        // Sedikit turun membentuk busur lautan di sisi kiri/kanan
+        const translateY = Math.pow(absOffset, 1.4) * (isMobile ? 8 : 12);
+
+        // Rotasi perspektif sangat halus agar ikan tidak terlihat goyang saat digeser
+        const rotateDeg = offset * -1.8;
+
+        // Opasitas mulus menghilang di kejauhan
+        let opacity = 1 - Math.pow(absOffset / 2.65, 1.65);
+        if (isMobile && absOffset > 1.35) {
+          opacity *= Math.max(0, 1 - (absOffset - 1.35) * 1.6);
+        }
+        opacity = Math.max(0, Math.min(1, opacity));
+
+        // Z-index bertingkat berdasarkan kedekatan ke tengah
+        const zIndex = Math.round(50 - absOffset * 10);
+
+        item.style.transform = `translate3d(calc(-50% + ${translateX.toFixed(2)}px), calc(-50% + ${translateY.toFixed(2)}px), 0) scale(${scale.toFixed(4)}) rotate(${rotateDeg.toFixed(2)}deg)`;
+        item.style.opacity = opacity.toFixed(3);
+        item.style.zIndex = zIndex;
+        item.style.pointerEvents = absOffset < 1.6 ? 'auto' : 'none';
+
+        // Aktifkan animasi berenang sinusoidal hanya pada ikan utama di tengah saat sudah diam tenang
+        const isSettled = !isDragging && Math.abs(targetIndex - smoothIndex) < 0.02 && absOffset < 0.05;
+        if (isSettled) {
+          if (!inner.classList.contains('fish-float')) inner.classList.add('fish-float');
+        } else {
+          if (inner.classList.contains('fish-float')) inner.classList.remove('fish-float');
+        }
+      }
+
+      requestAnimationFrame(updateCarouselPhysics);
+    }
+
+    function prevFish() {
+      velocity = 0;
+      targetIndex = Math.round(targetIndex) - 1;
+    }
+
+    function nextFish() {
+      velocity = 0;
+      targetIndex = Math.round(targetIndex) + 1;
+    }
+
+    function randomFish() {
+      const total = FISH_DATA.length;
+      if (total <= 1) return;
+      const currentMod = ((Math.round(targetIndex) % total) + total) % total;
+      let nextMod;
+      do {
+        nextMod = Math.floor(Math.random() * total);
+      } while (nextMod === currentMod);
+
+      // Berputar 1 putaran penuh + selisih agar terasa seru dan mulus
+      let diff = nextMod - currentMod;
+      if (diff <= 0) diff += total;
+      targetIndex = Math.round(targetIndex) + diff;
+      showToast('🎲', `Ikan acak terpilih: ${FISH_DATA[nextMod].name}!`);
+    }
+
+    /**
+     * Kontrol Kecepatan, Mulai Bermain, & Modal Minimalis
+     */
+    function setSpeed(speed) {
+      selectedSpeed = speed;
+      document.querySelectorAll('.speed-btn').forEach(btn => {
+        if (btn.dataset.speed === speed) {
+          btn.className = 'speed-btn px-2.5 py-1 rounded-full text-xs font-bold bg-amber-400 text-slate-950 shadow-sm transition-all';
+        } else {
+          btn.className = 'speed-btn px-2.5 py-1 rounded-full text-xs font-bold text-white/75 hover:text-white transition-all';
+        }
+      });
+    }
+
+    function startGame() {
+      const total = FISH_DATA.length;
+      const activeMod = ((Math.round(targetIndex) % total) + total) % total;
+      const fish = FISH_DATA[activeMod];
+      const playerName = document.getElementById('playerNameInput').value.trim() || 'Pemain';
+      showToast('🌊', `Terjun ke lautan sebagai ${playerName} (${fish.name} · ${selectedSpeed})!`);
+    }
+
+    function switchView(view) {
+      if (view === 'carousel') {
+        closeModal('upgradeModal');
+        closeModal('piagamModal');
+      }
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function renderModals() {
+      const upgrades = [
+        { icon: '🧲', title: 'Radius Sedot', level: 'Lv. 4', cost: 450, desc: 'Perluas jangkauan sedotan kawanan ikan kecil.' },
+        { icon: '⚡', title: 'Kapasitas Boost', level: 'Lv. 3', cost: 600, desc: 'Berenang lebih cepat saat mengejar mangsa langka.' },
+        { icon: '🪙', title: 'Magnet Koin', level: 'Lv. 5', cost: 850, desc: 'Tarik hujan koin otomatis saat bonus Sapu Bersih.' }
+      ];
+
+      const upgradeList = document.getElementById('upgradeList');
+      if (upgradeList) {
+        upgradeList.innerHTML = upgrades.map((u, i) => `
+          <div class="flex items-center justify-between p-3.5 rounded-2xl bg-white/10 border border-white/15">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">${u.icon}</span>
+              <div>
+                <div class="font-bold text-sm flex items-center gap-2">
+                  <span>${u.title}</span>
+                  <span class="text-[11px] px-2 py-0.5 rounded-full bg-sky-400/25 text-sky-200">${u.level}</span>
+                </div>
+                <p class="text-xs text-white/70 mt-0.5">${u.desc}</p>
+              </div>
+            </div>
+            <button onclick="buyUpgrade(${i}, ${u.cost}, '${u.title}')" class="px-3.5 py-1.5 rounded-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs shadow-sm transition-transform active:scale-95 shrink-0">
+              $${u.cost}
+            </button>
+          </div>
+        `).join('');
+      }
+
+      const piagams = [
+        { title: 'Pemburu Pemula', desc: 'Sedot 100 ikan kecil pertama', unlocked: true },
+        { title: 'Sapu Bersih!', desc: 'Habiskan 5 gerombolan penuh', unlocked: true },
+        { title: 'Kolektor Albino', desc: 'Buka karakter Alba', unlocked: false },
+        { title: 'Raja Palung', desc: 'Capai skor 100,000', unlocked: false },
+        { title: 'Combo Master', desc: 'Raih 25x Combo beruntun', unlocked: false },
+        { title: 'Sultan Lautan', desc: 'Kumpulkan 10,000 koin', unlocked: false }
+      ];
+
+      const piagamList = document.getElementById('piagamList');
+      if (piagamList) {
+        piagamList.innerHTML = piagams.map(p => `
+          <div class="p-3 rounded-2xl border ${p.unlocked ? 'bg-amber-400/15 border-amber-300/40' : 'bg-white/5 border-white/10 opacity-60'}">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-xs sm:text-sm">${p.unlocked ? '🏅' : '🔒'} ${p.title}</span>
+              ${p.unlocked ? '<span class="text-[10px] font-bold text-amber-300">TERBUKA</span>' : ''}
+            </div>
+            <p class="text-[11px] text-white/75 mt-1">${p.desc}</p>
+          </div>
+        `).join('');
+      }
+    }
+
+    function buyUpgrade(idx, cost, title) {
+      if (coins < cost) {
+        showToast('⚠️', 'Koin belum cukup untuk upgrade ini!');
+        return;
+      }
+      coins -= cost;
+      document.getElementById('coinDisplay').textContent = coins.toLocaleString('en-US');
+      showToast('⚡', `${title} berhasil ditingkatkan!`);
+    }
+
+    let toastTimer = null;
+    function showToast(icon, message) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastIcon').textContent = icon;
+      document.getElementById('toastMessage').textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 2400);
+    }
+
+    /**
+     * Navigasi Keyboard, Scroll Wheel, & Drag-to-Scroll 1:1 (Mouse & Touch)
+     */
+    window.addEventListener('keydown', (e) => {
+      if (document.activeElement.tagName === 'INPUT') return;
+      if (e.key === 'ArrowLeft') prevFish();
+      if (e.key === 'ArrowRight') nextFish();
+      if (e.key === 'Escape') {
+        closeModal('upgradeModal');
+        closeModal('piagamModal');
+      }
+    });
+
+    // Akumulator Wheel / Trackpad yang responsif tanpa tersendat
+    let wheelAccumulator = 0;
+    let wheelSnapTimer = null;
+    const stageEl = document.getElementById('carouselStage');
+
+    stageEl.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      wheelAccumulator += delta * 0.0028;
+
+      if (Math.abs(wheelAccumulator) >= 0.35) {
+        const steps = Math.trunc(wheelAccumulator / 0.35);
+        targetIndex += steps;
+        wheelAccumulator -= steps * 0.35;
+      }
+
+      clearTimeout(wheelSnapTimer);
+      wheelSnapTimer = setTimeout(() => {
+        wheelAccumulator = 0;
+        targetIndex = Math.round(targetIndex);
+      }, 140);
+    }, { passive: false });
+
+    // Unified Pointer Events (Mouse Drag & Touch Swipe 1:1 dengan Momentum Inersia)
+    stageEl.addEventListener('pointerdown', (e) => {
+      // Abaikan jika menekan tombol panah kiri/kanan atau titik indikator
+      if (e.target.closest('button')) return;
+
+      isDragging = true;
+      dragMoved = false;
+      dragStartX = e.clientX;
+      dragStartIndex = smoothIndex;
+      lastPointerX = e.clientX;
+      lastPointerTime = performance.now();
+      pointerVelocity = 0;
+      velocity = 0;
+      stageEl.setPointerCapture(e.pointerId);
+    });
+
+    stageEl.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStartX;
+      if (Math.abs(dx) > 6) dragMoved = true;
+
+      const isMobile = window.innerWidth < 640;
+      const dragSensitivity = isMobile ? 175 : 290;
+
+      // Geser langsung mengikuti posisi kursor/jari 1:1
+      smoothIndex = dragStartIndex - (dx / dragSensitivity);
+      targetIndex = smoothIndex;
+
+      // Hitung kecepatan pointer untuk momentum saat dilepas
+      const now = performance.now();
+      const dt = Math.max(8, now - lastPointerTime);
+      const instantVel = -((e.clientX - lastPointerX) / dragSensitivity) / (dt / 16.67);
+      pointerVelocity = pointerVelocity * 0.65 + instantVel * 0.35;
+
+      lastPointerX = e.clientX;
+      lastPointerTime = now;
+    });
+
+    function endDrag(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      if (e && e.pointerId !== undefined && stageEl.hasPointerCapture(e.pointerId)) {
+        stageEl.releasePointerCapture(e.pointerId);
+      }
+
+      // Lempar lembut dengan inersia terkontrol lalu kunci presisi ke ikan terdekat tanpa memantul
+      const clampedVel = Math.max(-0.35, Math.min(0.35, pointerVelocity));
+      const projectedIndex = smoothIndex + clampedVel * 2.2;
+      targetIndex = Math.round(projectedIndex);
+      velocity = 0;
+
+      setTimeout(() => {
+        dragMoved = false;
+      }, 50);
+    }
+
+    stageEl.addEventListener('pointerup', endDrag);
+    stageEl.addEventListener('pointercancel', endDrag);
+
+    /**
+     * ANIMASI KANVAS BAWAH LAUT HIDUP
+     * Menampilkan gelembung naik, partikel plankton bercahaya, dan siluet ikan kecil di kejauhan.
+     */
+    const canvas = document.getElementById('oceanCanvas');
+    const ctx = canvas.getContext('2d');
+    let bubbles = [];
+    let ambientFish = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initOceanLife() {
+      resizeCanvas();
+      bubbles = Array.from({ length: 38 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: 1.5 + Math.random() * 4.5,
+        speed: 0.35 + Math.random() * 0.9,
+        wobble: Math.random() * Math.PI * 2,
+        alpha: 0.15 + Math.random() * 0.35
+      }));
+
+      ambientFish = Array.from({ length: 14 }, () => ({
+        x: Math.random() * canvas.width,
+        y: canvas.height * (0.12 + Math.random() * 0.78),
+        size: 6 + Math.random() * 11,
+        speed: (0.25 + Math.random() * 0.55) * (Math.random() > 0.5 ? 1 : -1),
+        alpha: 0.08 + Math.random() * 0.14,
+        phase: Math.random() * Math.PI * 2
+      }));
+    }
+
+    function drawAmbientFish(f, time) {
+      ctx.save();
+      ctx.translate(f.x, f.y + Math.sin(time * 0.002 + f.phase) * 5);
+      if (f.speed < 0) ctx.scale(-1, 1);
+
+      ctx.fillStyle = `rgba(224, 242, 254, ${f.alpha})`;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, f.size, f.size * 0.45, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ekor
+      ctx.beginPath();
+      ctx.moveTo(-f.size * 0.85, 0);
+      ctx.lineTo(-f.size * 1.45, -f.size * 0.42);
+      ctx.lineTo(-f.size * 1.45, f.size * 0.42);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function animateOcean(time) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Update & gambar ikan latar belakang
+      ambientFish.forEach(f => {
+        f.x += f.speed;
+        if (f.speed > 0 && f.x > canvas.width + 40) f.x = -40;
+        if (f.speed < 0 && f.x < -40) f.x = canvas.width + 40;
+        drawAmbientFish(f, time);
+      });
+
+      // Update & gambar gelembung air
+      bubbles.forEach(b => {
+        b.y -= b.speed;
+        b.wobble += 0.025;
+        const bx = b.x + Math.sin(b.wobble) * 10;
+
+        if (b.y < -15) {
+          b.y = canvas.height + 15;
+          b.x = Math.random() * canvas.width;
+        }
+
+        ctx.beginPath();
+        ctx.arc(bx, b.y, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${b.alpha})`;
+        ctx.fill();
+
+        // Kilau kecil pada gelembung
+        ctx.beginPath();
+        ctx.arc(bx - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.28, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${b.alpha + 0.25})`;
+        ctx.fill();
+      });
+
+      requestAnimationFrame(animateOcean);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // Jalankan saat halaman selesai dimuat
+    window.onload = function () {
+      initCarousel();
+      renderModals();
+      initOceanLife();
+      requestAnimationFrame(updateCarouselPhysics);
+      requestAnimationFrame(animateOcean);
+    };
+  </script>
+</body>
+</html>

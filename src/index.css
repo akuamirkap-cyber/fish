@@ -1,0 +1,659 @@
+@import "tailwindcss";
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #06183b;
+    color: #fff;
+    font-family: "Fredoka", system-ui, -apple-system, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+.clean-font {
+  font-family: "Fredoka", system-ui, -apple-system, sans-serif;
+}
+
+.text-outline {
+  text-shadow:
+    -1.5px -1.5px 0 rgba(10, 18, 40, 0.88),
+    1.5px -1.5px 0 rgba(10, 18, 40, 0.88),
+    -1.5px 1.5px 0 rgba(10, 18, 40, 0.88),
+    1.5px 1.5px 0 rgba(10, 18, 40, 0.88),
+    0 2.5px 5px rgba(0, 0, 0, 0.72);
+}
+
+/* ============ CARVED WOODEN ARCADE PANELS ============ */
+.artistic-wood-board {
+  border-radius: 22px;
+  border: 3.5px solid #2b1405;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 224, 178, 0.04) 0px,
+      rgba(255, 224, 178, 0.04) 3px,
+      rgba(20, 8, 2, 0.06) 3px,
+      rgba(20, 8, 2, 0.06) 9px
+    ),
+    linear-gradient(180deg, #9c6533 0%, #7d4c21 48%, #5e3512 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 226, 174, 0.45),
+    inset 0 -3px 0 rgba(36, 16, 4, 0.75),
+    0 14px 30px rgba(0, 0, 0, 0.65);
+}
+
+.wood-lagoon-porthole {
+  border-radius: 16px;
+  border: 3px solid #2a1405;
+  background: radial-gradient(ellipse at 50% 25%, #2ec4e8 0%, #0e6ca8 55%, #072959 100%);
+  box-shadow:
+    inset 0 4px 16px rgba(0, 0, 0, 0.65),
+    0 2px 0 rgba(255, 224, 172, 0.35);
+}
+
+.artistic-inset {
+  border-radius: 14px;
+  border: 2px solid #231004;
+  background: linear-gradient(180deg, #2d1708 0%, #3d210d 100%);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.65),
+    0 1px 0 rgba(255, 224, 170, 0.25);
+}
+
+.ff-carved-slot {
+  border-radius: 10px;
+  border: 2px solid #241105;
+  background: linear-gradient(180deg, #211106 0%, #381e0b 100%);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.78),
+    0 1px 0 rgba(255, 226, 170, 0.3);
+}
+
+.ff-bar-slot {
+  border-radius: 999px;
+  border: 2px solid #241105;
+  background: #1b0e05;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 226, 170, 0.28);
+}
+
+.ff-yellow-fill {
+  background: linear-gradient(180deg, #fff57a 0%, #f5c816 55%, #cc8c06 100%);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, 0.72);
+}
+
+.ff-label {
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff6d1;
+  text-shadow:
+    -1.5px -1.5px 0 #231004,
+    1.5px -1.5px 0 #231004,
+    -1.5px 1.5px 0 #231004,
+    1.5px 1.5px 0 #231004,
+    0 2px 3px rgba(0, 0, 0, 0.7);
+}
+
+.ui-btn {
+  border-radius: 12px;
+  border: 2.5px solid #271305;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 4px 0 #241105,
+    0 6px 12px rgba(0, 0, 0, 0.45);
+  transition: transform 0.1s ease, filter 0.12s ease;
+}
+
+.ui-btn:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.ui-btn:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.wood-fish-tile {
+  border-radius: 14px;
+  border: 2px solid #2b1506;
+  background: linear-gradient(180deg, #3c220e 0%, #241206 100%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 222, 168, 0.18),
+    0 4px 10px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  contain: layout style paint;
+  transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.wood-fish-tile:hover {
+  transform: translateY(-2px);
+  border-color: #eab308;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 236, 179, 0.3),
+    0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
+.wood-fish-tile-rare {
+  border-color: #38bdf8;
+  background: linear-gradient(180deg, #1b2f4f 0%, #151434 100%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(165, 243, 252, 0.28),
+    0 4px 12px rgba(6, 182, 212, 0.22);
+}
+
+.wood-fish-tile-rare:hover {
+  border-color: #fde047;
+  box-shadow:
+    inset 0 1.5px 0 rgba(254, 240, 138, 0.42),
+    0 6px 16px rgba(34, 211, 238, 0.32);
+}
+
+.wood-fish-tile-active {
+  border-radius: 14px;
+  border: 2.5px solid #fff3a1;
+  background: linear-gradient(180deg, #ffe26b 0%, #f59e0b 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    0 6px 16px rgba(245, 158, 11, 0.45);
+  cursor: pointer;
+  contain: layout style paint;
+}
+
+.etalase-lagoon-window {
+  border-radius: 9px;
+  border: 1.5px solid rgba(7, 25, 54, 0.72);
+  background: radial-gradient(ellipse at 50% 24%, #24b6e0 0%, #0d5b94 58%, #051e45 100%);
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.52),
+    inset 0 -6px 10px rgba(4, 15, 38, 0.42);
+}
+
+.etalase-lagoon-window-rare {
+  border-color: rgba(125, 211, 252, 0.46);
+  background: radial-gradient(ellipse at 50% 24%, #2ad0e6 0%, #1d428a 56%, #131340 100%);
+  box-shadow:
+    inset 0 3px 9px rgba(0, 0, 0, 0.48),
+    inset 0 0 14px rgba(103, 232, 249, 0.22);
+}
+
+.wood-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 6px;
+}
+
+.wood-scroll::-webkit-scrollbar-track {
+  background: #231105;
+  border-radius: 999px;
+}
+
+.wood-scroll::-webkit-scrollbar-thumb {
+  background: #9c6533;
+  border-radius: 999px;
+  border: 1.5px solid #231105;
+}
+
+/* ============ TITLE & ANIMATIONS ============ */
+.fish-word-gold {
+  color: #ffd83d;
+  text-shadow:
+    -2px -2px 0 #1f0c03,
+    2px -2px 0 #1f0c03,
+    -2px 2px 0 #1f0c03,
+    2px 2px 0 #1f0c03,
+    0 3px 0 #9a3412,
+    0 6px 12px rgba(0, 0, 0, 0.62);
+}
+
+.fish-word-io {
+  color: #4adeff;
+  text-shadow:
+    -2px -2px 0 #071936,
+    2px -2px 0 #071936,
+    -2px 2px 0 #071936,
+    2px 2px 0 #071936,
+    0 3px 0 #0369a1,
+    0 6px 12px rgba(0, 0, 0, 0.62);
+}
+
+.fish-letter {
+  display: inline-block;
+  animation: letterBob 2.6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.fish-title-shine {
+  color: #7dd3fc;
+}
+
+.ui-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.22) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: sheenSweep 4.8s ease-in-out infinite;
+  will-change: transform;
+  pointer-events: none;
+}
+
+@keyframes sheenSweep {
+  0%,
+  65% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+@keyframes letterBob {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.bob {
+  animation: gentleBob 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes gentleBob {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.play-btn-pulse {
+  animation: playPulse 2.1s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes playPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.sun-halo-spin {
+  animation: haloSpin 32s linear infinite;
+  will-change: transform;
+}
+
+@keyframes haloSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mascot-wiggle {
+  animation: mascotWiggle 2.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes mascotWiggle {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(-4px);
+  }
+}
+
+.coral-sway {
+  transform-origin: bottom center;
+  animation: coralSway 3.6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.coral-sway-r {
+  transform-origin: bottom center;
+  animation: coralSway 4.2s ease-in-out infinite reverse;
+  will-change: transform;
+}
+
+@keyframes coralSway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.float-bubble-a {
+  animation: floatBubble 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.float-bubble-b {
+  animation: floatBubble 5.5s ease-in-out infinite 1.2s;
+  will-change: transform, opacity;
+}
+
+.float-bubble-c {
+  animation: floatBubble 8.2s ease-in-out infinite 0.5s;
+  will-change: transform, opacity;
+}
+
+@keyframes floatBubble {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(-28px) translateX(6px);
+    opacity: 0.9;
+  }
+}
+
+.frenzy-pulse {
+  animation: frenzyPulse 0.45s ease-in-out infinite alternate;
+}
+
+@keyframes frenzyPulse {
+  from {
+    transform: skewX(-7deg) scale(1);
+  }
+  to {
+    transform: skewX(-7deg) scale(1.07);
+  }
+}
+
+.pop {
+  animation: coinPop 0.24s ease-out;
+}
+
+@keyframes coinPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.24);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.blink {
+  animation: blinkWarn 0.65s ease-in-out infinite alternate;
+}
+
+@keyframes blinkWarn {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.4;
+  }
+}
+
+.gameover-board-in {
+  animation: gameoverBoardIn 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.gameover-medal-in {
+  animation: gameoverMedalIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.gameover-star-in {
+  animation: gameoverStarIn 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes gameoverBoardIn {
+  from {
+    opacity: 0;
+    transform: scale(0.93) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes gameoverMedalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.65) rotate(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes gameoverStarIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.ocean-body-font {
+  font-family: "Plus Jakarta Sans", "Fredoka", system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: "Fredoka", system-ui, sans-serif;
+}
+
+.sun-rays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.ray {
+  position: absolute;
+  top: -20%;
+  width: 18%;
+  height: 140%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.13) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0) 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0) 100%);
+  transform-origin: top center;
+  animation: swayRay 9s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.ray:nth-child(1) {
+  left: 8%;
+  width: 14%;
+  animation-delay: 0s;
+}
+.ray:nth-child(2) {
+  left: 28%;
+  width: 22%;
+  animation-delay: -2s;
+}
+.ray:nth-child(3) {
+  left: 54%;
+  width: 18%;
+  animation-delay: -4s;
+}
+.ray:nth-child(4) {
+  left: 76%;
+  width: 15%;
+  animation-delay: -1s;
+}
+
+@keyframes swayRay {
+  0% {
+    opacity: 0.4;
+    transform: rotate(12deg) scaleX(0.95);
+  }
+  100% {
+    opacity: 0.78;
+    transform: rotate(17deg) scaleX(1.06);
+  }
+}
+
+@keyframes swimFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0px, 0) rotate(0deg);
+  }
+  30% {
+    transform: translate3d(0, -9px, 0) rotate(-1.4deg);
+  }
+  70% {
+    transform: translate3d(0, 6px, 0) rotate(1.2deg);
+  }
+}
+
+.fish-float {
+  animation: swimFloat 4.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.fish-spotlight {
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.34) 0%,
+    rgba(125, 211, 252, 0.15) 44%,
+    rgba(255, 255, 255, 0) 72%
+  );
+  will-change: transform;
+}
+
+.glass-pill {
+  background: linear-gradient(180deg, rgba(12, 54, 94, 0.62) 0%, rgba(6, 30, 58, 0.54) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 6px 16px rgba(2, 16, 36, 0.25);
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.glass-pill-hover:hover {
+  background: linear-gradient(180deg, rgba(14, 64, 110, 0.78) 0%, rgba(8, 38, 72, 0.72) 100%);
+  border-color: rgba(255, 255, 255, 0.38);
+  transform: translateY(-1px);
+}
+
+.glass-pill-hover:active {
+  transform: scale(0.96);
+}
+
+.glass-modal {
+  background: linear-gradient(180deg, rgba(10, 44, 80, 0.94) 0%, rgba(5, 24, 48, 0.96) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 25px 50px -12px rgba(2, 16, 32, 0.7);
+}
+
+.ocean-text-shadow {
+  text-shadow: 0 2px 12px rgba(4, 28, 52, 0.68);
+}
+
+.logo-shadow {
+  text-shadow: 0 4px 14px rgba(4, 28, 52, 0.55);
+}
+
+.carousel-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  will-change: transform, opacity;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.carousel-item:active {
+  cursor: grabbing;
+}
+
+.btn-play {
+  background: linear-gradient(135deg, #22c55e 0%, #10b981 50%, #059669 100%);
+  box-shadow:
+    0 12px 28px -6px rgba(16, 185, 129, 0.55),
+    inset 0 1px 1px rgba(255, 255, 255, 0.45);
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.btn-play:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 16px 34px -6px rgba(16, 185, 129, 0.72),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.btn-play:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+.badge-langka {
+  background: linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6);
+  box-shadow: 0 2px 10px rgba(236, 72, 153, 0.45);
+}
+
+.badge-umum {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gameover-board-in,
+  .gameover-medal-in,
+  .gameover-star-in,
+  .fish-letter,
+  .bob,
+  .play-btn-pulse,
+  .sun-halo-spin,
+  .mascot-wiggle,
+  .coral-sway,
+  .coral-sway-r,
+  .float-bubble-a,
+  .float-bubble-b,
+  .float-bubble-c,
+  .frenzy-pulse,
+  .pop,
+  .blink,
+  .ray,
+  .fish-float {
+    animation: none !important;
+  }
+}
